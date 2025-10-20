@@ -1,288 +1,513 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Tic-Tac-Toe AI</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Games Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
         :root {
-            --bg-color: #1a1a2e;
+            --bg-color: #0f172a;
+            --panel-bg: #111827;
+            --accent: #8b5cf6;
+            --accent-2: #10b981;
+            --muted: #6b7280;
+            --text: #e5e7eb;
+            --danger: #ef4444;
             --board-bg: #16213e;
             --cell-bg: #0f3460;
             --player-x-color: #e94560;
             --player-o-color: #53a8b6;
-            --text-color: #e0e0e0;
             --win-line-color: #fca311;
         }
 
+        * { box-sizing: border-box; }
+        html, body { height: 100%; }
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            background: radial-gradient(1200px 800px at 10% 10%, #0b1022, #0f172a 60%);
+            color: var(--text);
             margin: 0;
-        }
-
-        .game-container {
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 2.5em;
-            color: var(--text-color);
-            margin-bottom: 10px;
-        }
-
-        #status-panel {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-            height: 30px;
-            transition: color 0.3s ease;
-        }
-
-        #board {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 10px;
-            background-color: var(--board-bg);
-            padding: 10px;
-            border-radius: 10px;
-            position: relative;
-            transition: opacity 0.3s ease;
-        }
-
-        #board.disabled {
-            pointer-events: none;
-            opacity: 0.6;
-        }
-
-        .cell {
-            background-color: var(--cell-bg);
-            border-radius: 5px;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 3.5em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+            flex-direction: column;
+            min-height: 100vh;
         }
-
-        .cell:hover {
-            background-color: #1f4068;
-        }
-
-        .cell.x {
-            color: var(--player-x-color);
-        }
-
-        .cell.o {
-            color: var(--player-o-color);
-        }
-
-        .cell.win {
-            background-color: rgba(252, 163, 17, 0.3);
-        }
-
-        /* Modal styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
+        header {
+            padding: 20px 24px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            justify-content: space-between;
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(6px);
+            border-bottom: 1px solid #1f2937;
         }
-
-        .modal-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background-color: var(--board-bg);
-            padding: 40px;
-            border-radius: 10px;
-            text-align: center;
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-        
-        .modal-overlay.visible .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-content h2 {
-            margin-top: 0;
-            font-size: 2.5em;
-        }
-
-        #restart-button {
-            background-color: var(--player-x-color);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.2em;
-            border-radius: 5px;
+        .brand { font-weight: 600; font-size: 1.25rem; letter-spacing: 0.3px; }
+        .brand .accent { color: var(--accent); }
+        nav { display: flex; flex-wrap: wrap; gap: 8px; }
+        nav button {
+            border: 1px solid #1f2937;
+            background: #0b1220;
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.15s ease;
         }
+        nav button.active, nav button:hover { border-color: var(--accent); color: #fff; }
 
-        #restart-button:hover {
-            background-color: #d83c54;
-        }
+        main { display: grid; grid-template-columns: 320px 1fr; gap: 24px; padding: 24px; flex: 1; }
+        .sidebar { background: rgba(17, 24, 39, 0.6); border: 1px solid #1f2937; border-radius: 12px; padding: 16px; }
+        .sidebar h2 { margin: 0 0 8px; font-size: 1rem; color: var(--muted); font-weight: 600; }
+        .sidebar .card { background: #0b1220; border: 1px solid #1f2937; padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+        .sidebar a { color: var(--accent-2); text-decoration: none; }
+        .content { background: rgba(17, 24, 39, 0.6); border: 1px solid #1f2937; border-radius: 12px; padding: 20px; min-height: 520px; }
+        .view { display: none; }
+        .view.active { display: block; }
+
+        .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .row + .row { margin-top: 12px; }
+        label { font-size: 0.9rem; color: var(--muted); }
+        input, select, textarea { background: #0b1220; color: var(--text); border: 1px solid #1f2937; border-radius: 8px; padding: 8px 10px; }
+        input[type="number"] { width: 100px; }
+        textarea { width: 100%; min-height: 120px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; }
+        .btn { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 10px 14px; cursor: pointer; }
+        .btn.secondary { background: #0b1220; border: 1px solid #1f2937; }
+        .btn.danger { background: var(--danger); }
+
+        /* Tic-Tac-Toe */
+        #ttt-board { display: grid; grid-template-columns: repeat(3, 100px); grid-template-rows: repeat(3, 100px); gap: 10px; background: var(--board-bg); padding: 10px; border-radius: 10px; }
+        #ttt-board.disabled { opacity: 0.6; pointer-events: none; }
+        .cell { background: var(--cell-bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 3.2rem; font-weight: 600; cursor: pointer; user-select: none; transition: background 0.15s; }
+        .cell:hover { background: #1f4068; }
+        .cell.x { color: var(--player-x-color); }
+        .cell.o { color: var(--player-o-color); }
+        .cell.win { background-color: rgba(252, 163, 17, 0.3); }
+
+        /* Maze */
+        .maze-grid { display: inline-grid; gap: 2px; background: #0b1220; padding: 6px; border-radius: 8px; border: 1px solid #1f2937; }
+        .maze-cell { width: 20px; height: 20px; border-radius: 4px; }
+        .maze-wall { background: #111827; }
+        .maze-path { background: #10b981; }
+        .maze-free { background: #374151; }
+        .maze-start { background: #2563eb; }
+        .maze-goal { background: #f59e0b; }
+
+        /* Sudoku */
+        .sudoku-grid { display: grid; grid-template-columns: repeat(9, 40px); gap: 4px; }
+        .sudoku-cell { width: 40px; height: 40px; text-align: center; font-size: 1rem; }
+        .sudoku-subgrid { box-shadow: inset 0 0 0 2px #1f2937; }
+
+        /* N-Queens */
+        .board { display: grid; grid-template-columns: repeat(var(--n), 40px); grid-template-rows: repeat(var(--n), 40px); }
+        .square { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .sq-dark { background: #1f2937; }
+        .sq-light { background: #374151; }
+        .queen { color: #fbbf24; font-weight: 700; }
+
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.2s; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content { background: #0b1220; border: 1px solid #1f2937; padding: 24px; border-radius: 10px; text-align: center; }
+
+        footer { padding: 16px 24px; color: var(--muted); font-size: 0.85rem; border-top: 1px solid #1f2937; background: rgba(17,24,39,0.6); }
     </style>
+    <script>
+        const API = {
+            ttt: '/api/tictactoe/get_ai_move',
+            mazeGen: '/api/maze/generate',
+            mazeSolve: '/api/maze/solve',
+            sudokuSolve: '/api/sudoku/solve',
+            nqueensSolve: '/api/nqueens/solve',
+            treasureSolve: '/api/treasure/solve',
+            chessMove: '/api/chess/move',
+        };
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navigation
+            const nav = document.querySelector('nav');
+            const views = Array.from(document.querySelectorAll('.view'));
+            nav.addEventListener('click', (e) => {
+                if (e.target.tagName !== 'BUTTON') return;
+                const id = e.target.dataset.target;
+                document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                views.forEach(v => v.classList.toggle('active', v.id === id));
+            });
+
+            // Default view
+            document.querySelector('nav button[data-target="view-ttt"]').click();
+
+            // Tic-Tac-Toe
+            (function tttInit(){
+                const boardEl = document.getElementById('ttt-board');
+                const statusEl = document.getElementById('ttt-status');
+                const modal = document.getElementById('ttt-modal');
+                const modalMsg = document.getElementById('ttt-modal-msg');
+                const restartBtn = document.getElementById('ttt-restart');
+                let boardState = [['', '', ''], ['', '', ''], ['', '', '']];
+                let isPlayerTurn = true;
+                let gameActive = true;
+
+                function renderBoard(){
+                    boardEl.innerHTML = '';
+                    for (let r=0;r<3;r++){
+                        for (let c=0;c<3;c++){
+                            const cell = document.createElement('div');
+                            cell.className = 'cell';
+                            cell.dataset.row = r;
+                            cell.dataset.col = c;
+                            const v = boardState[r][c];
+                            if (v === 'X') { cell.classList.add('x'); cell.textContent='X'; }
+                            if (v === 'O') { cell.classList.add('o'); cell.textContent='O'; }
+                            cell.addEventListener('click', onClickCell);
+                            boardEl.appendChild(cell);
+                        }
+                    }
+                }
+
+                async function onClickCell(e){
+                    if (!isPlayerTurn || !gameActive) return;
+                    const r = +e.currentTarget.dataset.row;
+                    const c = +e.currentTarget.dataset.col;
+                    if (boardState[r][c] !== '') return;
+                    boardState[r][c] = 'X';
+                    renderBoard();
+                    isPlayerTurn = false;
+                    statusEl.textContent = 'AI is thinking...';
+                    boardEl.classList.add('disabled');
+                    try {
+                        const res = await fetch(API.ttt, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ board: boardState }) });
+                        const data = await res.json();
+                        if (data.ai_move) {
+                            const [rr, cc] = data.ai_move; boardState[rr][cc] = 'O';
+                        }
+                        renderBoard();
+                        if (data.status !== 'continue') endGame(data.status, data.winning_line);
+                        else { isPlayerTurn = true; statusEl.textContent = 'Your Turn (X)'; }
+                    } catch (err) { statusEl.textContent = 'Error contacting server'; console.error(err); }
+                    finally { if (gameActive) boardEl.classList.remove('disabled'); }
+                }
+
+                function endGame(status, winningLine){
+                    gameActive = false; boardEl.classList.add('disabled');
+                    let msg = '';
+                    if (status === 'ai_wins'){ msg = 'AI Wins!'; modalMsg.style.color = 'var(--player-o-color)'; }
+                    else if (status === 'player_wins'){ msg = 'You Win!'; modalMsg.style.color = 'var(--player-x-color)'; }
+                    else { msg = "It's a Draw!"; modalMsg.style.color = 'var(--text)'; }
+                    if (winningLine) {
+                        winningLine.forEach(([rr, cc]) => {
+                            const cell = boardEl.children[rr * 3 + cc];
+                            if (cell) cell.classList.add('win');
+                        });
+                    }
+                    modalMsg.textContent = msg;
+                    setTimeout(()=>modal.classList.add('visible'), 300);
+                }
+
+                function restart(){ boardState = [['','',''],['','',''],['','','']]; isPlayerTurn=true; gameActive=true; statusEl.textContent='Your Turn (X)'; modal.classList.remove('visible'); boardEl.classList.remove('disabled'); renderBoard(); }
+                restartBtn.addEventListener('click', restart);
+                renderBoard();
+            })();
+
+            // Maze
+            (function mazeInit(){
+                const gridWrap = document.getElementById('maze-grid');
+                const genBtn = document.getElementById('maze-generate');
+                const solveBtn = document.getElementById('maze-solve');
+                const rowsEl = document.getElementById('maze-rows');
+                const colsEl = document.getElementById('maze-cols');
+                let grid = null, start = null, goal = null;
+
+                function renderGrid(){
+                    if (!grid) return;
+                    const r = grid.length, c = grid[0].length;
+                    gridWrap.style.gridTemplateColumns = `repeat(${c}, 20px)`;
+                    gridWrap.innerHTML = '';
+                    for (let i=0;i<r;i++){
+                        for(let j=0;j<c;j++){
+                            const div = document.createElement('div');
+                            div.className = 'maze-cell ' + (grid[i][j] === 1 ? 'maze-wall' : 'maze-free');
+                            if (start && i===start[0] && j===start[1]) div.classList.add('maze-start');
+                            if (goal && i===goal[0] && j===goal[1]) div.classList.add('maze-goal');
+                            gridWrap.appendChild(div);
+                        }
+                    }
+                }
+
+                genBtn.addEventListener('click', async ()=>{
+                    const rows = +rowsEl.value || 10; const cols = +colsEl.value || 10;
+                    const res = await fetch(API.mazeGen, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({rows, cols})});
+                    const data = await res.json();
+                    grid = data.grid; start = data.start; goal = data.goal; renderGrid();
+                });
+
+                solveBtn.addEventListener('click', async ()=>{
+                    if (!grid) return;
+                    const res = await fetch(API.mazeSolve, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({grid, start, goal})});
+                    const data = await res.json();
+                    const path = data.path || [];
+                    // Overlay path
+                    const r = grid.length, c = grid[0].length;
+                    for (let k=0;k<path.length;k++){
+                        const [i,j] = path[k];
+                        const idx = i * c + j;
+                        const cell = gridWrap.children[idx];
+                        if (cell) cell.classList.add('maze-path');
+                    }
+                });
+            })();
+
+            // Sudoku
+            (function sudokuInit(){
+                const gridEl = document.getElementById('sudoku-grid');
+                const solveBtn = document.getElementById('sudoku-solve');
+                const clearBtn = document.getElementById('sudoku-clear');
+                // Build 9x9 inputs
+                for (let r=0;r<9;r++){
+                    for (let c=0;c<9;c++){
+                        const inp = document.createElement('input');
+                        inp.className = 'sudoku-cell'; inp.type='number'; inp.min='1'; inp.max='9';
+                        inp.placeholder='';
+                        if (r%3===0 && c===0) {
+                            // visual separation per subgrid row start
+                            const sep = document.createElement('div'); sep.className='sudoku-subgrid'; sep.style.gridColumn=`1 / span 9`; sep.style.height='2px'; sep.style.margin='6px 0'; if (r>0) gridEl.appendChild(sep);
+                        }
+                        gridEl.appendChild(inp);
+                        if ((c+1)%3===0 && c!==8) {
+                            const spacer = document.createElement('div'); spacer.style.width='6px'; spacer.style.height='0'; gridEl.appendChild(spacer);
+                        }
+                    }
+                }
+
+                function readBoard(){
+                    const cells = Array.from(gridEl.querySelectorAll('input.sudoku-cell'));
+                    const board = [];
+                    for (let r=0;r<9;r++){
+                        const row = [];
+                        for (let c=0;c<9;c++){
+                            const v = cells[r*9 + c].value.trim();
+                            row.push(v ? parseInt(v,10) : 0);
+                        }
+                        board.push(row);
+                    }
+                    return board;
+                }
+
+                function writeBoard(board){
+                    const cells = Array.from(gridEl.querySelectorAll('input.sudoku-cell'));
+                    for (let r=0;r<9;r++){
+                        for (let c=0;c<9;c++){
+                            cells[r*9 + c].value = board[r][c] ? String(board[r][c]) : '';
+                        }
+                    }
+                }
+
+                solveBtn.addEventListener('click', async ()=>{
+                    const board = readBoard();
+                    const res = await fetch(API.sudokuSolve, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({board})});
+                    if (res.ok){ const data = await res.json(); writeBoard(data.solution); }
+                    else { alert('No solution or invalid board'); }
+                });
+
+                clearBtn.addEventListener('click', ()=>{ writeBoard(Array.from({length:9},()=>Array(9).fill(0))); });
+            })();
+
+            // N-Queens
+            (function nqueensInit(){
+                const nEl = document.getElementById('nq-n');
+                const solveBtn = document.getElementById('nq-solve');
+                const boardEl = document.getElementById('nq-board');
+                function renderBoard(n, solution){
+                    boardEl.innerHTML='';
+                    boardEl.style.setProperty('--n', n);
+                    boardEl.className = 'board';
+                    const set = new Set((solution||[]).map(([r,c])=>`${r},${c}`));
+                    for (let r=0;r<n;r++){
+                        for (let c=0;c<n;c++){
+                            const sq = document.createElement('div');
+                            const dark = (r+c)%2===1; sq.className = 'square ' + (dark?'sq-dark':'sq-light');
+                            if (set.has(`${r},${c}`)) { sq.innerHTML = '<span class="queen">♛</span>'; }
+                            boardEl.appendChild(sq);
+                        }
+                    }
+                }
+                solveBtn.addEventListener('click', async ()=>{
+                    const n = Math.max(1, Math.min(14, parseInt(nEl.value||'8',10)));
+                    const res = await fetch(API.nqueensSolve, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({n})});
+                    const data = await res.json();
+                    renderBoard(data.n, data.solution||[]);
+                });
+                renderBoard(8, []);
+            })();
+
+            // Treasure Hunt
+            (function treasureInit(){
+                const sizeEl = document.getElementById('tr-size');
+                const runBtn = document.getElementById('tr-run');
+                const gridEl = document.getElementById('tr-grid');
+                function render(grid, path, start, goal){
+                    const r = grid.length, c = grid[0].length;
+                    gridEl.style.gridTemplateColumns = `repeat(${c}, 20px)`;
+                    gridEl.innerHTML = '';
+                    const pathSet = new Set((path||[]).map(([i,j])=>`${i},${j}`));
+                    for (let i=0;i<r;i++){
+                        for (let j=0;j<c;j++){
+                            const cell = document.createElement('div');
+                            cell.className = 'maze-cell ' + (grid[i][j]===1? 'maze-wall' : 'maze-free');
+                            if (start && i===start[0] && j===start[1]) cell.classList.add('maze-start');
+                            if (goal && i===goal[0] && j===goal[1]) cell.classList.add('maze-goal');
+                            if (pathSet.has(`${i},${j}`)) cell.classList.add('maze-path');
+                            gridEl.appendChild(cell);
+                        }
+                    }
+                }
+                runBtn.addEventListener('click', async ()=>{
+                    const size = parseInt(sizeEl.value||'5',10);
+                    const res = await fetch(`${API.treasureSolve}?size=${encodeURIComponent(size)}`);
+                    const data = await res.json();
+                    render(data.grid, data.path, data.start, data.goal);
+                });
+            })();
+
+            // Chess
+            (function chessInit(){
+                const fenEl = document.getElementById('ch-fen');
+                const depthEl = document.getElementById('ch-depth');
+                const moveBtn = document.getElementById('ch-move');
+                const outEl = document.getElementById('ch-output');
+                moveBtn.addEventListener('click', async ()=>{
+                    const fen = fenEl.value.trim(); if (!fen) { alert('Enter FEN'); return; }
+                    outEl.textContent = 'Analyzing...';
+                    const res = await fetch(API.chessMove, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({fen, depth: parseInt(depthEl.value||'2',10)})});
+                    const data = await res.json();
+                    if (data.error){ outEl.textContent = 'Server error: ' + data.error; }
+                    else { outEl.textContent = `Best move: ${data.best_move || 'None'} (score ${data.score})`; }
+                });
+            })();
+        });
+    </script>
 </head>
 <body>
+    <header>
+        <div class="brand">AI <span class="accent">Games</span> Hub</div>
+        <nav>
+            <button data-target="view-ttt" class="active">Tic-Tac-Toe</button>
+            <button data-target="view-maze">Maze Escape</button>
+            <button data-target="view-sudoku">Sudoku Solver</button>
+            <button data-target="view-nqueens">N-Queens</button>
+            <button data-target="view-treasure">Treasure Hunt</button>
+            <button data-target="view-chess">Chess (Alpha-Beta)</button>
+            <button data-target="view-about">About</button>
+        </nav>
+    </header>
+    <main>
+        <aside class="sidebar">
+            <h2>Resources</h2>
+            <div class="card">
+                <div>Backend API: <code>/api/*</code></div>
+                <div>Status: <span id="api-status">Ready</span></div>
+            </div>
+            <div class="card">
+                <a href="Project Report.pdf" target="_blank">Open Project Report (PDF)</a>
+            </div>
+            <div class="card">
+                <div><strong>Team</strong></div>
+                <div>Ali Naqi (23F-3052)</div>
+                <div>Muhammad Ahmad (23F-3028)</div>
+                <div>Saqib Javed (23F-3069)</div>
+                <div>Muhammad Aamir (23F-3073)</div>
+            </div>
+        </aside>
+        <section class="content">
+            <!-- Tic-Tac-Toe -->
+            <div class="view active" id="view-ttt">
+                <h2>Tic-Tac-Toe vs Unbeatable AI</h2>
+                <div class="row"><span id="ttt-status">Your Turn (X)</span><button class="btn secondary" id="ttt-restart">Restart</button></div>
+                <div id="ttt-board" style="margin-top:12px"></div>
+                <div id="ttt-modal" class="modal-overlay">
+                    <div class="modal-content">
+                        <h2 id="ttt-modal-msg"></h2>
+                        <button class="btn" id="ttt-restart-2" onclick="document.getElementById('ttt-restart').click()">Play Again</button>
+                    </div>
+                </div>
+            </div>
 
-    <div class="game-container">
-        <h1>Tic-Tac-Toe vs Unbeatable AI</h1>
-        <div id="status-panel">Your Turn (X)</div>
-        <div id="board"></div>
-    </div>
+            <!-- Maze -->
+            <div class="view" id="view-maze">
+                <h2>Maze Escape (Generate + A* Solve)</h2>
+                <div class="row">
+                    <label>Rows <input id="maze-rows" type="number" min="2" max="50" value="10" /></label>
+                    <label>Cols <input id="maze-cols" type="number" min="2" max="50" value="10" /></label>
+                    <button class="btn" id="maze-generate">Generate</button>
+                    <button class="btn" id="maze-solve">Solve</button>
+                </div>
+                <div id="maze-grid" class="maze-grid" style="margin-top:12px"></div>
+            </div>
 
-    <div id="end-game-modal" class="modal-overlay">
-        <div class="modal-content">
-            <h2 id="modal-message"></h2>
-            <button id="restart-button">Play Again</button>
-        </div>
-    </div>
+            <!-- Sudoku -->
+            <div class="view" id="view-sudoku">
+                <h2>Sudoku Solver (Backtracking)</h2>
+                <div class="row">
+                    <button class="btn" id="sudoku-solve">Solve</button>
+                    <button class="btn secondary" id="sudoku-clear">Clear</button>
+                </div>
+                <div id="sudoku-grid" class="sudoku-grid" style="margin-top:12px"></div>
+            </div>
 
-    <script>
-        const boardElement = document.getElementById('board');
-        const statusPanel = document.getElementById('status-panel');
-        const modal = document.getElementById('end-game-modal');
-        const modalMessage = document.getElementById('modal-message');
-        const restartButton = document.getElementById('restart-button');
+            <!-- N-Queens -->
+            <div class="view" id="view-nqueens">
+                <h2>N-Queens</h2>
+                <div class="row">
+                    <label>N <input id="nq-n" type="number" min="1" max="14" value="8" /></label>
+                    <button class="btn" id="nq-solve">Solve</button>
+                </div>
+                <div id="nq-board" style="margin-top:12px"></div>
+            </div>
 
-        let boardState = [['', '', ''], ['', '', ''], ['', '', '']];
-        let isPlayerTurn = true;
-        let gameActive = true;
+            <!-- Treasure Hunt -->
+            <div class="view" id="view-treasure">
+                <h2>Treasure Hunt (Q-Learning Demo)</h2>
+                <div class="row">
+                    <label>Grid Size <input id="tr-size" type="number" min="3" max="8" value="5" /></label>
+                    <button class="btn" id="tr-run">Run</button>
+                </div>
+                <div id="tr-grid" class="maze-grid" style="margin-top:12px"></div>
+            </div>
 
-        function renderBoard() {
-            boardElement.innerHTML = '';
-            for (let r = 0; r < 3; r++) {
-                for (let c = 0; c < 3; c++) {
-                    const cell = document.createElement('div');
-                    cell.classList.add('cell');
-                    cell.dataset.row = r;
-                    cell.dataset.col = c;
-                    
-                    if (boardState[r][c] === 'X') {
-                        cell.classList.add('x');
-                        cell.textContent = 'X';
-                    } else if (boardState[r][c] === 'O') {
-                        cell.classList.add('o');
-                        cell.textContent = 'O';
-                    }
-                    
-                    cell.addEventListener('click', handleCellClick);
-                    boardElement.appendChild(cell);
-                }
-            }
-        }
+            <!-- Chess -->
+            <div class="view" id="view-chess">
+                <h2>Chess (Minimax with Alpha-Beta)</h2>
+                <div class="row" style="align-items:flex-start">
+                    <label style="flex:1">FEN
+                        <textarea id="ch-fen" placeholder="Enter FEN here">r1bqkbnr/pppp1ppp/2n5/4p3/2B5/5N2/PPPPPPPP/RNBQK2R w KQkq - 2 3</textarea>
+                    </label>
+                    <label>Depth <select id="ch-depth"><option>1</option><option selected>2</option><option>3</option></select></label>
+                    <button class="btn" id="ch-move">Get Best Move</button>
+                </div>
+                <div id="ch-output" style="margin-top:12px;color:#93c5fd">Ready.</div>
+            </div>
 
-        async function handleCellClick(event) {
-            if (!isPlayerTurn || !gameActive) return;
-
-            const row = event.target.dataset.row;
-            const col = event.target.dataset.col;
-
-            if (boardState[row][col] === '') {
-                boardState[row][col] = 'X';
-                renderBoard();
-                isPlayerTurn = false;
-                statusPanel.textContent = "AI is thinking...";
-                boardElement.classList.add('disabled'); // Disable board during AI turn
-
-                try {
-                    const response = await fetch('http://127.0.0.1:5000/get_ai_move', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ board: boardState }),
-                    });
-
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    
-                    const data = await response.json();
-                    
-                    if(data.ai_move) {
-                        boardState[data.ai_move[0]][data.ai_move[1]] = 'O';
-                    }
-                    
-                    renderBoard();
-
-                    if (data.status !== 'continue') {
-                        endGame(data.status, data.winning_line);
-                    } else {
-                        isPlayerTurn = true;
-                        statusPanel.textContent = "Your Turn (X)";
-                    }
-                } catch (error) {
-                    statusPanel.textContent = "Error: Could not connect to server.";
-                    console.error("Fetch error:", error);
-                } finally {
-                    if (gameActive) {
-                        boardElement.classList.remove('disabled'); // Re-enable board
-                    }
-                }
-            }
-        }
-
-        function endGame(status, winningLine) {
-            gameActive = false;
-            boardElement.classList.add('disabled');
-            let message = '';
-
-            if (status === 'ai_wins') {
-                message = 'AI Wins!';
-                modalMessage.style.color = 'var(--player-o-color)';
-            } else if (status === 'player_wins') {
-                message = 'You Win!';
-                 modalMessage.style.color = 'var(--player-x-color)';
-            } else {
-                message = "It's a Draw!";
-                modalMessage.style.color = 'var(--text-color)';
-            }
-            
-            if (winningLine) {
-                 winningLine.forEach(pos => {
-                    const cell = boardElement.children[pos[0] * 3 + pos[1]];
-                    cell.classList.add('win');
-                });
-            }
-
-            modalMessage.textContent = message;
-            setTimeout(() => modal.classList.add('visible'), 500);
-        }
-
-        function restartGame() {
-            boardState = [['', '', ''], ['', '', ''], ['', '', '']];
-            isPlayerTurn = true;
-            gameActive = true;
-            statusPanel.textContent = "Your Turn (X)";
-            modal.classList.remove('visible');
-            boardElement.classList.remove('disabled');
-            renderBoard();
-        }
-
-        restartButton.addEventListener('click', restartGame);
-
-        // Initial render
-        renderBoard();
-    </script>
+            <!-- About -->
+            <div class="view" id="view-about">
+                <h2>About This Project</h2>
+                <p>This AI Games Hub features multiple classic games and AI demos with a clean, professional interface. Each game showcases a core algorithm:</p>
+                <ul>
+                    <li><strong>Tic-Tac-Toe</strong>: Minimax (unbeatable)</li>
+                    <li><strong>Maze Escape</strong>: DFS generation + A* pathfinding</li>
+                    <li><strong>Sudoku</strong>: Backtracking solver</li>
+                    <li><strong>N-Queens</strong>: Backtracking</li>
+                    <li><strong>Treasure Hunt</strong>: Q-Learning demo</li>
+                    <li><strong>Chess</strong>: Minimax with Alpha-Beta (requires python-chess on server)</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+    <footer>
+        © AI Games Hub. Built with Flask and vanilla JS.
+    </footer>
 </body>
 </html>
 
