@@ -1,288 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Tic-Tac-Toe AI</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
-        :root {
-            --bg-color: #1a1a2e;
-            --board-bg: #16213e;
-            --cell-bg: #0f3460;
-            --player-x-color: #e94560;
-            --player-o-color: #53a8b6;
-            --text-color: #e0e0e0;
-            --win-line-color: #fca311;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        .game-container {
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 2.5em;
-            color: var(--text-color);
-            margin-bottom: 10px;
-        }
-
-        #status-panel {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-            height: 30px;
-            transition: color 0.3s ease;
-        }
-
-        #board {
-            display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 10px;
-            background-color: var(--board-bg);
-            padding: 10px;
-            border-radius: 10px;
-            position: relative;
-            transition: opacity 0.3s ease;
-        }
-
-        #board.disabled {
-            pointer-events: none;
-            opacity: 0.6;
-        }
-
-        .cell {
-            background-color: var(--cell-bg);
-            border-radius: 5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 3.5em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .cell:hover {
-            background-color: #1f4068;
-        }
-
-        .cell.x {
-            color: var(--player-x-color);
-        }
-
-        .cell.o {
-            color: var(--player-o-color);
-        }
-
-        .cell.win {
-            background-color: rgba(252, 163, 17, 0.3);
-        }
-
-        /* Modal styles */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .modal-overlay.visible {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background-color: var(--board-bg);
-            padding: 40px;
-            border-radius: 10px;
-            text-align: center;
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-        
-        .modal-overlay.visible .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-content h2 {
-            margin-top: 0;
-            font-size: 2.5em;
-        }
-
-        #restart-button {
-            background-color: var(--player-x-color);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.2em;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        #restart-button:hover {
-            background-color: #d83c54;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="game-container">
-        <h1>Tic-Tac-Toe vs Unbeatable AI</h1>
-        <div id="status-panel">Your Turn (X)</div>
-        <div id="board"></div>
-    </div>
-
-    <div id="end-game-modal" class="modal-overlay">
-        <div class="modal-content">
-            <h2 id="modal-message"></h2>
-            <button id="restart-button">Play Again</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Games Hub</title>
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="brand">AI <span class="accent">Games</span> Hub</div>
+      <nav>
+        <a href="/" class="active">Home</a>
+        <a href="/pages/tictactoe.html">Tic-Tac-Toe</a>
+        <a href="/pages/maze.html">Maze</a>
+        <a href="/pages/sudoku.html">Sudoku</a>
+        <a href="/pages/nqueens.html">N-Queens</a>
+        <a href="/pages/treasure.html">Treasure</a>
+        <a href="/pages/chess.html">Chess</a>
+      </nav>
+    </header>
+    <main>
+      <aside class="sidebar">
+        <h2>Resources</h2>
+        <div class="card">
+          <div>Backend API: <code>/api/*</code></div>
+          <div>Status: <span id="api-status">Ready</span></div>
         </div>
-    </div>
-
-    <script>
-        const boardElement = document.getElementById('board');
-        const statusPanel = document.getElementById('status-panel');
-        const modal = document.getElementById('end-game-modal');
-        const modalMessage = document.getElementById('modal-message');
-        const restartButton = document.getElementById('restart-button');
-
-        let boardState = [['', '', ''], ['', '', ''], ['', '', '']];
-        let isPlayerTurn = true;
-        let gameActive = true;
-
-        function renderBoard() {
-            boardElement.innerHTML = '';
-            for (let r = 0; r < 3; r++) {
-                for (let c = 0; c < 3; c++) {
-                    const cell = document.createElement('div');
-                    cell.classList.add('cell');
-                    cell.dataset.row = r;
-                    cell.dataset.col = c;
-                    
-                    if (boardState[r][c] === 'X') {
-                        cell.classList.add('x');
-                        cell.textContent = 'X';
-                    } else if (boardState[r][c] === 'O') {
-                        cell.classList.add('o');
-                        cell.textContent = 'O';
-                    }
-                    
-                    cell.addEventListener('click', handleCellClick);
-                    boardElement.appendChild(cell);
-                }
-            }
-        }
-
-        async function handleCellClick(event) {
-            if (!isPlayerTurn || !gameActive) return;
-
-            const row = event.target.dataset.row;
-            const col = event.target.dataset.col;
-
-            if (boardState[row][col] === '') {
-                boardState[row][col] = 'X';
-                renderBoard();
-                isPlayerTurn = false;
-                statusPanel.textContent = "AI is thinking...";
-                boardElement.classList.add('disabled'); // Disable board during AI turn
-
-                try {
-                    const response = await fetch('http://127.0.0.1:5000/get_ai_move', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ board: boardState }),
-                    });
-
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    
-                    const data = await response.json();
-                    
-                    if(data.ai_move) {
-                        boardState[data.ai_move[0]][data.ai_move[1]] = 'O';
-                    }
-                    
-                    renderBoard();
-
-                    if (data.status !== 'continue') {
-                        endGame(data.status, data.winning_line);
-                    } else {
-                        isPlayerTurn = true;
-                        statusPanel.textContent = "Your Turn (X)";
-                    }
-                } catch (error) {
-                    statusPanel.textContent = "Error: Could not connect to server.";
-                    console.error("Fetch error:", error);
-                } finally {
-                    if (gameActive) {
-                        boardElement.classList.remove('disabled'); // Re-enable board
-                    }
-                }
-            }
-        }
-
-        function endGame(status, winningLine) {
-            gameActive = false;
-            boardElement.classList.add('disabled');
-            let message = '';
-
-            if (status === 'ai_wins') {
-                message = 'AI Wins!';
-                modalMessage.style.color = 'var(--player-o-color)';
-            } else if (status === 'player_wins') {
-                message = 'You Win!';
-                 modalMessage.style.color = 'var(--player-x-color)';
-            } else {
-                message = "It's a Draw!";
-                modalMessage.style.color = 'var(--text-color)';
-            }
-            
-            if (winningLine) {
-                 winningLine.forEach(pos => {
-                    const cell = boardElement.children[pos[0] * 3 + pos[1]];
-                    cell.classList.add('win');
-                });
-            }
-
-            modalMessage.textContent = message;
-            setTimeout(() => modal.classList.add('visible'), 500);
-        }
-
-        function restartGame() {
-            boardState = [['', '', ''], ['', '', ''], ['', '', '']];
-            isPlayerTurn = true;
-            gameActive = true;
-            statusPanel.textContent = "Your Turn (X)";
-            modal.classList.remove('visible');
-            boardElement.classList.remove('disabled');
-            renderBoard();
-        }
-
-        restartButton.addEventListener('click', restartGame);
-
-        // Initial render
-        renderBoard();
-    </script>
-</body>
-</html>
+        <div class="card">
+          <a href="/Project Report.pdf" target="_blank">Open Project Report (PDF)</a>
+        </div>
+        <div class="card">
+          <div><strong>Team</strong></div>
+          <div>Ali Naqi (23F-3052)</div>
+          <div>Muhammad Ahmad (23F-3028)</div>
+          <div>Saqib Javed (23F-3069)</div>
+          <div>Muhammad Aamir (23F-3073)</div>
+        </div>
+      </aside>
+      <section class="content">
+        <h2>Welcome to the AI Games Hub</h2>
+        <p>Explore modular pages for each AI-powered game and algorithm demo.</p>
+        <div class="grid" style="margin-top: 16px">
+          <div class="card-lg">
+            <h3>Tic-Tac-Toe</h3>
+            <p>Unbeatable Minimax AI.</p>
+            <div class="actions"><a class="btn" href="/pages/tictactoe.html">Play</a></div>
+          </div>
+          <div class="card-lg">
+            <h3>Maze Escape</h3>
+            <p>DFS generation + A* pathfinding.</p>
+            <div class="actions"><a class="btn" href="/pages/maze.html">Open</a></div>
+          </div>
+          <div class="card-lg">
+            <h3>Sudoku Solver</h3>
+            <p>Backtracking-based solving.</p>
+            <div class="actions"><a class="btn" href="/pages/sudoku.html">Solve</a></div>
+          </div>
+          <div class="card-lg">
+            <h3>N-Queens</h3>
+            <p>Place N queens with backtracking.</p>
+            <div class="actions"><a class="btn" href="/pages/nqueens.html">Try</a></div>
+          </div>
+          <div class="card-lg">
+            <h3>Treasure Hunt</h3>
+            <p>Q-Learning demonstration.</p>
+            <div class="actions"><a class="btn" href="/pages/treasure.html">Run</a></div>
+          </div>
+          <div class="card-lg">
+            <h3>Chess</h3>
+            <p>Alpha-Beta search using python-chess.</p>
+            <div class="actions"><a class="btn" href="/pages/chess.html">Analyze</a></div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>© AI Games Hub. Built with Flask and vanilla JS.</footer>
+  </body>
+  </html>
 

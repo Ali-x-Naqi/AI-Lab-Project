@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sudoku • AI Games Hub</title>
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="brand">AI <span class="accent">Games</span> Hub</div>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/pages/tictactoe.html">Tic-Tac-Toe</a>
+        <a href="/pages/maze.html">Maze</a>
+        <a href="/pages/sudoku.html" class="active">Sudoku</a>
+        <a href="/pages/nqueens.html">N-Queens</a>
+        <a href="/pages/treasure.html">Treasure</a>
+        <a href="/pages/chess.html">Chess</a>
+      </nav>
+    </header>
+    <main>
+      <aside class="sidebar">
+        <h2>Sudoku Info</h2>
+        <div class="card">Backtracking Sudoku solver. Empty cells = 0.</div>
+      </aside>
+      <section class="content">
+        <h2>Sudoku Solver</h2>
+        <div class="row">
+          <button class="btn" id="sudoku-solve">Solve</button>
+          <button class="btn secondary" id="sudoku-clear">Clear</button>
+        </div>
+        <div id="sudoku-grid" class="sudoku-grid" style="margin-top:12px"></div>
+      </section>
+    </main>
+    <footer>© AI Games Hub.</footer>
+    <script type="module" src="/assets/js/sudoku.js"></script>
+  </body>
+</html>
