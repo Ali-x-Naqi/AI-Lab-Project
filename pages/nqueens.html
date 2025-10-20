@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>N-Queens • AI Games Hub</title>
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="brand">AI <span class="accent">Games</span> Hub</div>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/pages/tictactoe.html">Tic-Tac-Toe</a>
+        <a href="/pages/maze.html">Maze</a>
+        <a href="/pages/sudoku.html">Sudoku</a>
+        <a href="/pages/nqueens.html" class="active">N-Queens</a>
+        <a href="/pages/treasure.html">Treasure</a>
+        <a href="/pages/chess.html">Chess</a>
+      </nav>
+    </header>
+    <main>
+      <aside class="sidebar">
+        <h2>N-Queens</h2>
+        <div class="card">Find a placement of N queens so none attack each other.</div>
+      </aside>
+      <section class="content">
+        <h2>N-Queens</h2>
+        <div class="row">
+          <label>N <input id="nq-n" type="number" min="1" max="14" value="8" /></label>
+          <button class="btn" id="nq-solve">Solve</button>
+        </div>
+        <div id="nq-board" style="margin-top:12px"></div>
+      </section>
+    </main>
+    <footer>© AI Games Hub.</footer>
+    <script type="module" src="/assets/js/nqueens.js"></script>
+  </body>
+</html>

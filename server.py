@@ -480,8 +480,19 @@ def api_health():
 
 @app.route('/')
 def root_index():
-    # Serve the hub if running via Flask; otherwise open index.html file from disk
+    # Serve landing page
     return send_from_directory('.', 'index.html')
+
+
+# Pretty routes for modular pages
+@app.route('/pages/<path:filename>')
+def pages(filename: str):
+    return send_from_directory('pages', filename)
+
+
+@app.route('/assets/<path:filename>')
+def assets(filename: str):
+    return send_from_directory('assets', filename)
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)

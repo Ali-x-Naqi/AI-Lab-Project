@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic-Tac-Toe • AI Games Hub</title>
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="brand">AI <span class="accent">Games</span> Hub</div>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/pages/tictactoe.html" class="active">Tic-Tac-Toe</a>
+        <a href="/pages/maze.html">Maze</a>
+        <a href="/pages/sudoku.html">Sudoku</a>
+        <a href="/pages/nqueens.html">N-Queens</a>
+        <a href="/pages/treasure.html">Treasure</a>
+        <a href="/pages/chess.html">Chess</a>
+      </nav>
+    </header>
+    <main>
+      <aside class="sidebar">
+        <h2>Game Info</h2>
+        <div class="card">Play against an unbeatable Minimax AI.</div>
+        <div class="card">Endpoint: <code>/api/tictactoe/get_ai_move</code></div>
+      </aside>
+      <section class="content">
+        <h2>Tic-Tac-Toe vs Unbeatable AI</h2>
+        <div class="row">
+          <span id="ttt-status">Your Turn (X)</span>
+          <button class="btn secondary" id="ttt-restart">Restart</button>
+        </div>
+        <div id="ttt-board" style="margin-top:12px"></div>
+        <div id="ttt-modal" class="modal-overlay">
+          <div class="modal-content">
+            <h2 id="ttt-modal-msg"></h2>
+            <button class="btn" id="ttt-restart-2">Play Again</button>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>© AI Games Hub.</footer>
+    <script type="module" src="/assets/js/tictactoe.js"></script>
+  </body>
+</html>

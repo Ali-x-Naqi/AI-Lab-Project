@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chess • AI Games Hub</title>
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+  </head>
+  <body>
+    <header>
+      <div class="brand">AI <span class="accent">Games</span> Hub</div>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/pages/tictactoe.html">Tic-Tac-Toe</a>
+        <a href="/pages/maze.html">Maze</a>
+        <a href="/pages/sudoku.html">Sudoku</a>
+        <a href="/pages/nqueens.html">N-Queens</a>
+        <a href="/pages/treasure.html">Treasure</a>
+        <a href="/pages/chess.html" class="active">Chess</a>
+      </nav>
+    </header>
+    <main>
+      <aside class="sidebar">
+        <h2>Chess</h2>
+        <div class="card">Alpha-Beta minimax using python-chess. Provide a FEN.</div>
+        <div class="card">Endpoint: <code>/api/chess/move</code></div>
+      </aside>
+      <section class="content">
+        <h2>Chess Analysis</h2>
+        <div class="row" style="align-items:flex-start">
+          <label style="flex:1">FEN
+            <textarea id="ch-fen" placeholder="Enter FEN here">r1bqkbnr/pppp1ppp/2n5/4p3/2B5/5N2/PPPPPPPP/RNBQK2R w KQkq - 2 3</textarea>
+          </label>
+          <label>Depth <select id="ch-depth"><option>1</option><option selected>2</option><option>3</option></select></label>
+          <button class="btn" id="ch-move">Get Best Move</button>
+        </div>
+        <div id="ch-output" style="margin-top:12px;color:#93c5fd">Ready.</div>
+      </section>
+    </main>
+    <footer>© AI Games Hub.</footer>
+    <script type="module" src="/assets/js/chess.js"></script>
+  </body>
+</html>
